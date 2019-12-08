@@ -1,7 +1,5 @@
 /* To-do:
    Implement indicator for when two instruments are collaborating together
-   Fix so doesn't freak out after win
-   Collaborate after win 
    Decay rate fast makes you want to play faster, we need to make it so more and harder does not equate to winning
 */
 
@@ -396,6 +394,5 @@ void winner_winner() {
     EVERY_N_MILLISECONDS( 5 ) {
       gHue++;  // slowly cycle the "base color" through the rainbow
     }
-    FastLED.show();
   }
 }
