@@ -5,7 +5,7 @@ https://musictechwellness.wordpress.com/jam-station/
 instruments:
 Arduino source for the pipes, chimes, and drums instruments
 
-jam_station_midi_input:
+jam_station_midi_lights:
 Arduino source for LED tower display
 
 PD:

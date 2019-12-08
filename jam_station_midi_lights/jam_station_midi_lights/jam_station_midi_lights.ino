@@ -1,13 +1,13 @@
 /* To-do:
-   Make instrument range turn color of note
-   Base Drum and Snare range should be either blue or red
-
+   Implement indicator for when two instruments are collaborating together
+   Fix so doesn't freak out after 
+   Collaborate after win 
+   Decay rate fast makes you want to play faster, we need to make it so more and harder does not equate to winning
 */
 
 #include <FastLED.h>
 #include <MIDIUSB.h>
 #include "pitchToFrequency.h"
-
 // How many leds in your strip?
 #define NUM_LEDS 64
 #define LED_TYPE    WS2812B
@@ -231,9 +231,6 @@ void fadeall() {
 
 void fadeall_midi_effects() {
   for (int i = midi_effects_start; i < NUM_LEDS; i++) {
-    leds[i].nscale8_video(230);
-  }
-  for (int i = midi_effects_start + midi_effects_counter; i < NUM_LEDS; i++) {
     leds[i].nscale8(230);
   }
 }
@@ -264,7 +261,9 @@ void setup() {
 }
 
 void loop() {
-  midi_effects_decay();
+  if ( midi_effects_counter > NUM_LEDS/2 + 10 ) {
+    midi_effects_counter = NUM_LEDS/2 + 10;
+  }
   midiEventPacket_t rx = MidiUSB.read();
   switch (rx.header) {
     case 0:
@@ -307,7 +306,9 @@ void loop() {
 
   fadeall();
   fadeall_midi_effects();
-
+  midi_effects();
+  winner_winner();
+  midi_effects_decay();
   FastLED.show();
 }
 
@@ -369,16 +370,9 @@ void effects_initialize() {
 
 void midi_effects() {
   if ( midi_effects_counter + midi_effects_start >= NUM_LEDS) {
-    if (midi_effects_counter > NUM_LEDS) {
-      midi_effects_counter = NUM_LEDS;
-    }
-    winner_winner();
     winner_on_time = millis();
-    midi_effects_counter = 0;
-    midi_effects_reset = 1;
-    reset_lights();
-  }
-  for (int i = midi_effects_start; i < midi_effects_start + midi_effects_counter; i ++) {
+    }
+  for (int i = midi_effects_start; i < midi_effects_start + midi_effects_counter && i < NUM_LEDS; i ++) {
     leds[i] = CHSV(0, 0, 255);
   }
 }
@@ -398,22 +392,11 @@ void midi_effects_decay() {
 
 void winner_winner() {
   // FastLED's built-in rainbow generator
-  //  while (millis() - winner_on_time < winner_period) {
-  while (millis() - winner_on_time < winner_period) {
-    midi_effects_counter = 0;
-    fill_rainbow( leds, NUM_LEDS, gHue, 7);
+  if (millis() - winner_on_time < winner_period) {
+    fill_rainbow( &(leds[31]), NUM_LEDS /2 , gHue, 7);
     EVERY_N_MILLISECONDS( 5 ) {
       gHue++;  // slowly cycle the "base color" through the rainbow
     }
     FastLED.show();
-  }
-}
-
-void reset_lights() {
-  if (midi_effects_reset == 1) {
-//    initial_color();
-//    effects_initialize();
-    midi_effects_reset = 0;
-    midi_effects_counter = 0;
   }
 }
