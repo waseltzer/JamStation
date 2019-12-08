@@ -1,7 +1,5 @@
 /* To-do:
    Implement indicator for when two instruments are collaborating together
-   Fix so doesn't freak out after 
-   Collaborate after win 
    Decay rate fast makes you want to play faster, we need to make it so more and harder does not equate to winning
 */
 
@@ -31,8 +29,6 @@ const long winner_period = 3000;
 
 int midi_effects_start = 32; //Where on the pixel strip we're starting for midi effects
 int midi_effects_counter = 0; // count whe an effect happens, register it here
-int midi_effects_counter_max = NUM_LEDS + 10;
-int midi_effects_reset = 0;
 int midi_effects_register = 0;
 
 /*
@@ -202,6 +198,7 @@ void noteOn(byte channel, byte pitch, byte velocity) {
 //int same_tempo      = 6;     // Weight 2; When PD detects two instruments at the same tempo
 //int same_division   = 7;  // Weight 4; When PD does something that Torin figured out
 //int same_melody     = 8;    // Weight 6; When PD does something that Torin figured out
+
 
 void noteOff(byte channel, byte pitch, byte velocity) {
   Serial.print("Receive Note Off: ");
@@ -397,6 +394,5 @@ void winner_winner() {
     EVERY_N_MILLISECONDS( 5 ) {
       gHue++;  // slowly cycle the "base color" through the rainbow
     }
-    FastLED.show();
   }
 }
